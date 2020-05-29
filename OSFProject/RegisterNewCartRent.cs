@@ -40,38 +40,48 @@ namespace OSFProject
             string plate = textCartPlate.Text;
             if (myModel.Cars.Where(c => c.Plate == plate && c.Location == location).FirstOrDefault() != null)
             {
-                car = myModel.Cars.Where(c => c.Plate == plate && c.Location == location).FirstOrDefault();
-                reservation.CarID = car.CarID;
-                reservation.Location = car.Location;
+                    car = myModel.Cars.Where(c => c.Plate == plate && c.Location == location).FirstOrDefault();
+                    reservation.CarID = car.CarID;
+                    reservation.Location = car.Location;
+                       
+                int customerID = Convert.ToInt32(textClientID.Text);
+                if (customerModel.Customers.Where(c => c.CostumerID == customerID).FirstOrDefault() != null)
+                {
+                    customer = customerModel.Customers.Where(c => c.CostumerID == customerID).FirstOrDefault();
+                    reservation.CostumerID = customer.CostumerID;
+               
+                    reservation.StartDate = Convert.ToDateTime(dtStartDate.Text);
+                    reservation.EndDate = Convert.ToDateTime(dtEndDate.Text);
+
+                    if ((reservation.StartDate <= reservation.EndDate) && (reservation.StartDate >= DateTime.Now))
+                    {
+
+                    
+                        reservationStatus = myModel.ReservationStatuses.Where(r => r.ReservStatsID == 1).FirstOrDefault();
+                        //coupon = myModel.Coupons.Where(c => c.CouponCode == "0I0J93K").FirstOrDefault();
+
+                        reservation.ReservationStatus = reservationStatus;
+                        //reservation.CouponCode = coupon.CouponCode;
+
+
+                        myModel.Reservations.Add(reservation);
+                        myModel.SaveChanges();
+                        MessageBox.Show("Reservation added.");
+
+                    }else
+                    {
+                        MessageBox.Show("Invalid dates");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Invalid customer id!");
+                }
             }
             else
             {
                 MessageBox.Show("Invalid car plate or location!");
             }
-            int customerID = Convert.ToInt32(textClientID.Text);
-            if (customerModel.Customers.Where(c => c.CostumerID == customerID).FirstOrDefault() != null)
-            {
-                customer = customerModel.Customers.Where(c => c.CostumerID == customerID).FirstOrDefault();
-                reservation.CostumerID = customer.CostumerID;
-            }
-            else
-            {
-                MessageBox.Show("Invalid customer id!");
-            }
-            reservation.StartDate = Convert.ToDateTime(dtStartDate.Text);
-            reservation.EndDate = Convert.ToDateTime(dtEndDate.Text);
-
-            reservationStatus = myModel.ReservationStatuses.Where(r => r.ReservStatsID == 1).FirstOrDefault();
-            //coupon = myModel.Coupons.Where(c => c.CouponCode == "0I0J93K").FirstOrDefault();
-
-            reservation.ReservationStatus = reservationStatus;
-            //reservation.CouponCode = coupon.CouponCode;
-
-
-            myModel.Reservations.Add(reservation);
-            myModel.SaveChanges();
-            MessageBox.Show("Reservation added.");
-            
 
         }
 

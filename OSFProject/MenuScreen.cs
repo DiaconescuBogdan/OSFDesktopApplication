@@ -70,5 +70,14 @@ namespace OSFProject
         {
             
         }
+
+        private void MenuScreen_Load(object sender, EventArgs e)
+        {
+
+        }
+        private void checkReservationStatus()
+        {
+
+        }
     }
 }

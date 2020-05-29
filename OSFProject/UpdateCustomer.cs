@@ -39,8 +39,6 @@ namespace OSFProject
             try
             {
 
-           
-
                 SqlConnection con = new SqlConnection(conString);
                 con.Open();
 
@@ -48,7 +46,7 @@ namespace OSFProject
                 {
                     string q = "UPDATE Customers SET Name=@a2,BirthDate=@a3,Location=@a4 WHERE CostumerID=@a1";
                     SqlCommand cmd = new SqlCommand(q, con);
-                   
+
 
                     cmd.Parameters.AddWithValue("@a1", textClientId.Text);
                     cmd.Parameters.AddWithValue("@a2", textClientName.Text);
@@ -67,73 +65,28 @@ namespace OSFProject
 
         private void btnUpdateModels_Click(object sender, EventArgs e)
         {
-            //using (var customerModel = new MyCustomerModel())
-            //{
-            //    customerModel.Entry(customer).State = System.Data.Entity.EntityState.Modified;
-            //    int customerId = Convert.ToInt32(textClientId.Text);
+            int customerID = Convert.ToInt32(textClientId.Text);
 
-            //    if (customerModel.Customers.Where(c => c.CostumerID == customerId).FirstOrDefault() != null)
-            //    {
-                    
-            //        //customer.CostumerID = customerId;
-            //        customer.Name = textClientName.Text;
-            //        customer.BirthDate = Convert.ToDateTime(dateTimePicker1.Text);
-            //        customer.Location = textLocation.Text;
-
-            //        customerModel.SaveChanges();
-            //        MessageBox.Show("Customer updated.");
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("Invalid CustomerID!");
-            //    }
-            //}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            customer.CostumerID = Convert.ToInt32(textClientId.Text);
-            customer.Name = textClientName.Text;
-            customer.BirthDate = Convert.ToDateTime(dateTimePicker1.Text);
-            customer.Location = textLocation.Text;
-
-            using (var customerModel = new MyCustomerModel())
+            if (customerModel.Customers.Where(r => r.CostumerID == customerID).FirstOrDefault() != null)
             {
-                customerModel.Entry(customer).State = System.Data.Entity.EntityState.Modified;
-                try
-                {
-                    customerModel.SaveChanges();
-                    MessageBox.Show("Customer updated.");
-                }
-                catch (Exception exception)
-                {
-                    if (exception.Source != null)
-                        MessageBox.Show("IOException source: {0}", exception.Source);
+                customer.CostumerID = customerModel.Customers.Where(c => c.CostumerID == customerID).FirstOrDefault().CostumerID;
+                customer.BirthDate = Convert.ToDateTime(dateTimePicker1.Text);
+                customer.Location = textLocation.Text;
+                customer.Name = textClientName.Text;
 
+                using (var customerModel = new MyCustomerModel())
+                {
+                    customerModel.Entry(customer).State = System.Data.Entity.EntityState.Modified;
+                    
+                        customerModel.SaveChanges();
+                        MessageBox.Show("Customer updated.");                 
                 }
 
             }
-
+            else
+            {
+                MessageBox.Show("Please insert valid customer ID");
+            }
         }
     }
 }

@@ -133,6 +133,7 @@
             this.Controls.Add(this.btnRegisterCR);
             this.Name = "MenuScreen";
             this.Text = "MenuScreen";
+            this.Load += new System.EventHandler(this.MenuScreen_Load);
             this.ResumeLayout(false);
 
         }

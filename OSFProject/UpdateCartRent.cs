@@ -38,70 +38,159 @@ namespace OSFProject
 
         }
 
+       
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            //using (var model = new MyModel())
-            //{
-                //reservation.ReservationID = Convert.ToInt32(textReservationID.Text);
+        
+            string location = textCity.Text;
+            string plate = textCartPlate.Text;
+            int reservId = Convert.ToInt32(textReservationID.Text);
 
-                int reservationID = Convert.ToInt32(textReservationID.Text);
-                if (myModel.Reservations.Where(r => r.ReservationID == reservationID).FirstOrDefault() != null)
+            if (myModel.Reservations.Where(r => r.ReservationID == reservId).FirstOrDefault() != null)
+            {
+                reservation.ReservationID = myModel.Reservations.Where(c => c.ReservationID == reservId).FirstOrDefault().ReservationID;
+
+
+                if (myModel.Cars.Where(c => c.Plate == plate && c.Location == location).FirstOrDefault() != null)
                 {
-
-                //reservation.ReservationID = reservationID;
-                    reservation = myModel.Reservations.Where(r => r.ReservationID == reservationID).FirstOrDefault();
-                    string plate = textCartPlate.Text;
-                    string location = textCity.Text;
-
-                    if (myModel.Cars.Where(c => c.Plate == plate && c.Location == location).FirstOrDefault() != null)
-                    {
-                    
-                        car = myModel.Cars.AsNoTracking().Where(c => c.Plate == plate && c.Location == location).FirstOrDefault();
-                        reservation.CarID = car.CarID;
-                        reservation.Location = car.Location;
-                    }
-                    else
-                    {   
-                        MessageBox.Show("Invalid car plate or location!");
-                        return;
-                    }
+                    car = myModel.Cars.Where(c => c.Plate == plate && c.Location == location).FirstOrDefault();
+                    reservation.CarID = car.CarID;
+                    reservation.Location = car.Location;
 
                     int customerID = Convert.ToInt32(textClientID.Text);
                     if (customerModel.Customers.Where(c => c.CostumerID == customerID).FirstOrDefault() != null)
                     {
-                        customer = customerModel.Customers.AsNoTracking().Where(c => c.CostumerID == customerID).FirstOrDefault();
+                        customer = customerModel.Customers.Where(c => c.CostumerID == customerID).FirstOrDefault();
                         reservation.CostumerID = customer.CostumerID;
+
+                        reservation.StartDate = Convert.ToDateTime(dtStartDate.Text);
+                        reservation.EndDate = Convert.ToDateTime(dtEndDate.Text);
+
+                        if ((reservation.StartDate <= reservation.EndDate) && (reservation.StartDate >= DateTime.Now))
+                        {
+                            if ((myModel.Reservations.Where(c => (c.EndDate < reservation.StartDate || c.StartDate > reservation.EndDate)
+                            && c.ReservationID != reservation.ReservationID).Any()) ||
+                            (myModel.Reservations.Where(c => c.ReservationID == reservation.ReservationID).Any()))
+                            {
+                                using (var MyDbEntities = new MyModel())
+                                {
+
+                                    MyDbEntities.Entry(reservation).State = System.Data.Entity.EntityState.Modified;
+                                    MyDbEntities.SaveChanges();
+                                    MessageBox.Show("Reservation updated.");
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("There is another reservation in this period");
+
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Please insert valid dates");
+                        }
+
                     }
                     else
                     {
-                        MessageBox.Show("Invalid customer id!");
-                    return;
-                    }
-                    reservation.StartDate = Convert.ToDateTime(dtStartDate.Text);
-                    reservation.EndDate = Convert.ToDateTime(dtEndDate.Text);
-
-                using (var model = new MyModel())
-                {
-                    
-                    myModel.Entry(reservation).State = System.Data.Entity.EntityState.Modified;
-
-                    try
-                    {
-                        myModel.SaveChanges();
-                        MessageBox.Show("Reservation updated.");
-                    }
-                    catch (Exception exception)
-                    {
-                        if (exception.Source != null)
-                            MessageBox.Show(exception.StackTrace);
+                        MessageBox.Show("Please insert a valid Customer Id");
 
                     }
                 }
-                } else
+                else
                 {
-                    MessageBox.Show("Invalid reservation id!");
+                    MessageBox.Show("Invalid car plate or location!");
+
                 }
-            //}
+            }
+            else
+            {
+                MessageBox.Show("Please insert valid reservation ID");
+            }
         }
     }
 }
+
+
+
+
+
+
+//string location = textCity.Text;
+//string plate = textCartPlate.Text;
+//int reservId = Convert.ToInt32(textReservationID.Text);
+////reservation = myModel.Reservations.Where(c => c.ReservationID == reservId).FirstOrDefault();
+//reservation.ReservationID = myModel.Reservations.Where(c => c.ReservationID == reservId).FirstOrDefault().ReservationID;
+//reservation.ReservationStatus = null;
+//if (myModel.Cars.Where(c => c.Plate == plate && c.Location == location).FirstOrDefault() != null)
+//{
+//    car = myModel.Cars.Where(c => c.Plate == plate && c.Location == location).FirstOrDefault();
+//    reservation.CarID = car.CarID;
+//    //reservation.Plate = MyCar.Plate;
+//    reservation.Location = car.Location;
+//}
+//else
+//{
+//    MessageBox.Show("Invalid car plate or location!");
+//    //this.Hide();
+//    //RegisterNewCar registerNewCar = new RegisterNewCar();
+//    //registerNewCar.ShowDialog();
+//    //this.Close();
+//}
+//int customerID = Convert.ToInt32(textClientID.Text);
+//if (customerModel.Customers.Where(c => c.CostumerID == customerID).FirstOrDefault() != null)
+//{
+//    customer = customerModel.Customers.Where(c => c.CostumerID == customerID).FirstOrDefault();
+//    reservation.CostumerID = customer.CostumerID;
+//}
+//else
+//{
+//    MessageBox.Show("Please insert a valid Customer Id");
+
+//}
+//reservation.StartDate = Convert.ToDateTime(dtStartDate.Text);
+//reservation.EndDate = Convert.ToDateTime(dtEndDate.Text);
+//using (var MyDbEntities = new MyModel())
+//{
+//    if ((reservation.StartDate <= reservation.EndDate) && (reservation.StartDate >= DateTime.Now))
+//    {
+//        if ((myModel.Reservations.Where(c => (c.EndDate < reservation.StartDate || c.StartDate > reservation.EndDate)
+//        && c.ReservationID != reservation.ReservationID).Any()) ||
+//        (myModel.Reservations.Where(c => c.ReservationID == reservation.ReservationID).Any()))
+//        {
+//            MyDbEntities.Entry(reservation).State = System.Data.Entity.EntityState.Modified;
+//            try
+//            {
+//                MyDbEntities.SaveChanges();
+//                MessageBox.Show("Reservation updated.");
+//            }
+//            catch (Exception exception)
+//            {
+//                if (exception.Source != null)
+//                    MessageBox.Show("IOException source: {0}", exception.Source);
+
+//            }
+
+//            //this.Hide();
+//            //Menu menu = new Menu();
+//            //menu.ShowDialog();
+//            //this.Close();
+//        }
+//        else
+//        {
+//            MessageBox.Show("Please insert valid dates");
+//            //this.Hide();
+//            //UpdateCarRental updateCarRental = new UpdateCarRental();
+//            //updateCarRental.ShowDialog();
+//            //this.Close();
+//        }
+//    }
+
+//}
+
+
+
+
+
+
